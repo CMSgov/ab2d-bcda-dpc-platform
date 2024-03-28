@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         app: [ab2d, bcda, dpc]
-        env: [dev, test, sbx, prod]
+        env: [dev, test, prod]
     env:
       TF_VAR_app: ${{ matrix.app }}
       TF_VAR_env: ${{ matrix.env }}
