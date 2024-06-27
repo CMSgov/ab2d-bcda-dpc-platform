@@ -7,6 +7,8 @@ on:
     paths:
       - .github/workflows/tfstate-apply.yml
       - terraform/services/tfstate/**
+      - terraform/modules/bucket/**
+      - terraform/modules/table/**
   workflow_dispatch: # Allow manual trigger
 
 jobs:
