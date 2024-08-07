@@ -9,7 +9,7 @@ locals {
     bcda = "bcda-${var.env}-rds"
   }
   memory_size = {
-    bcda = 1024
+    bcda = 3072
   }
 }
 
