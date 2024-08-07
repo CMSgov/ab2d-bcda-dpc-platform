@@ -63,6 +63,14 @@ module "github-actions-runner" {
     webhook_secret = var.webhook_secret
   }
 
+  # match the volume size of the source AMI snapshot
+  block_device_mappings = [{
+    device_name           = "/dev/xvda"
+    delete_on_termination = true
+    volume_size           = 31
+    encrypted             = true
+  }]
+
   webhook_lambda_zip                = "lambdas-download/webhook.zip"
   runner_binaries_syncer_lambda_zip = "lambdas-download/runner-binaries-syncer.zip"
   runners_lambda_zip                = "lambdas-download/runners.zip"

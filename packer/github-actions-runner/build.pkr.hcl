@@ -17,9 +17,9 @@ build {
     remote_folder = "/home/ec2-user/"
     environment_vars = []
     inline = concat([
-      "sudo yum -y update --security",
-      "sudo yum -y install amazon-cloudwatch-agent jq git docker",
-      "sudo yum -y install curl",
+      "sudo dnf upgrade-minimal -y",
+      "sudo dnf install -y amazon-cloudwatch-agent jq git docker libicu",
+      "sudo dnf install -y --allowerasing curl",
       "sudo systemctl enable docker.service",
       "sudo systemctl enable containerd.service",
       "sudo service docker start",
