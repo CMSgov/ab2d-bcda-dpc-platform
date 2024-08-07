@@ -38,3 +38,13 @@ jobs:
             TF_VAR_key_base64=/github-runner/app-key-base64
             TF_VAR_webhook_secret=/github-runner/webhook-secret
       - run: terraform apply -auto-approve
+      - name: notify slack # notify any terraform failiure via slack message in channel #ab2d-bcda-dpc-platform
+        id: slack
+        uses: slackapi/slack-github-action@v1.26.0
+        if: ${{ failure() }}
+        with:
+          channel-id: 'C04UG13JF9B' # slack channel to report terraform apply fail
+          slack-message: "Terraform apply failure\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}" # message that will be sent to the slack channel with the url
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
