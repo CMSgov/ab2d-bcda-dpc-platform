@@ -9,9 +9,9 @@ source "amazon-ebs" "github-actions-runner" {
   iam_instance_profile                      = "bcda-mgmt-github-actions"
 
   source_ami_filter {
-     filters = {
+    filters = {
       name = "al2023-legacy-gi-*"
-     }
+    }
     owners = ["${var.ami_account}"]
     most_recent = true
   }
