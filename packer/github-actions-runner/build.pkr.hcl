@@ -16,7 +16,7 @@ build {
   provisioner "shell" {
     remote_folder = "/home/ec2-user/"
     environment_vars = []
-    inline = concat([
+    inline = [
       "sudo yum -y update --security",
       "sudo yum -y install amazon-cloudwatch-agent jq git docker",
       "sudo yum -y install curl",
@@ -24,7 +24,7 @@ build {
       "sudo systemctl enable containerd.service",
       "sudo service docker start",
       "sudo usermod -a -G docker ec2-user",
-    ], var.custom_shell_commands)
+    ]
   }
 
   provisioner "file" {
