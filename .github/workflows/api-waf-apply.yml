@@ -27,6 +27,8 @@ jobs:
         include:
           - app: bcda
             env: dev
+          - app: dpc
+            env: prod
     steps:
       - uses: actions/checkout@v4
       - uses: ./actions/setup-tfenv-terraform
