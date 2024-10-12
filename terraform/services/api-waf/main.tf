@@ -31,6 +31,7 @@ resource "aws_wafv2_ip_set" "api_customers" {
 
   # Addresses will be managed outside of terraform. This is
   # a placeholder address for all apps/environments.
+  # See: https://confluence.cms.gov/x/UDs2Q
   addresses = ["203.0.113.0/32"]
 
   lifecycle {
