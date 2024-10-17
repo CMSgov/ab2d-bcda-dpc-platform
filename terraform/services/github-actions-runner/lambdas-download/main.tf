@@ -1,5 +1,5 @@
 locals {
-  release_tag = "v4.1.1"
+  release_tag = "v5.17.0"
 }
 
 module "lambdas" {
@@ -15,6 +15,10 @@ module "lambdas" {
     },
     {
       name = "runner-binaries-syncer"
+      tag  = local.release_tag
+    },
+    {
+      name = "ami-housekeeper"
       tag  = local.release_tag
     }
   ]

@@ -15,16 +15,14 @@ build {
 
   provisioner "shell" {
     remote_folder = "/home/ec2-user/"
-    environment_vars = []
-    inline = concat([
-      "sudo yum -y update --security",
-      "sudo yum -y install amazon-cloudwatch-agent jq git docker",
-      "sudo yum -y install curl",
+    inline = [
+      "sudo dnf install -y amazon-cloudwatch-agent jq git docker libicu curl",
+      "sudo dnf install -y https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm",
       "sudo systemctl enable docker.service",
       "sudo systemctl enable containerd.service",
-      "sudo service docker start",
+      "sudo systemctl start docker.service",
       "sudo usermod -a -G docker ec2-user",
-    ], var.custom_shell_commands)
+    ]
   }
 
   provisioner "file" {

@@ -51,7 +51,7 @@ data "aws_security_group" "vpn" {
 
 module "github-actions-runner" {
   source  = "philips-labs/github-runner/aws"
-  version = "4.1.1"
+  version = "5.17.0"
 
   aws_region = "us-east-1"
   vpc_id     = data.aws_vpc.managed.id
@@ -63,9 +63,18 @@ module "github-actions-runner" {
     webhook_secret = var.webhook_secret
   }
 
+  # match the volume size of the source AMI snapshot
+  block_device_mappings = [{
+    device_name           = "/dev/xvda"
+    delete_on_termination = true
+    volume_size           = 31
+    encrypted             = true
+  }]
+
   webhook_lambda_zip                = "lambdas-download/webhook.zip"
   runner_binaries_syncer_lambda_zip = "lambdas-download/runner-binaries-syncer.zip"
   runners_lambda_zip                = "lambdas-download/runners.zip"
+  ami_housekeeper_lambda_zip        = "lambdas-download/ami-housekeeper.zip"
 
   ami_owners = [var.ami_account]
   ami_filter = {
@@ -97,4 +106,16 @@ module "github-actions-runner" {
   instance_types = [
     "t3.large",
   ]
+
+  enable_ami_housekeeper = true
+  ami_housekeeper_cleanup_config = {
+    launchTemplateNames = ["github-actions-action-runner"]
+    minimumDaysOld      = 90
+    amiFilters = [
+      {
+        Name   = "name"
+        Values = ["github-actions-runner-*"]
+      }
+    ]
+  }
 }
