@@ -3,7 +3,7 @@ name: api-waf plan terraform
 on:
   pull_request:
     paths:
-      - .github/workflows/api-waf-plan.yml
+      - .github/workflows/api-waf-*
       - terraform/services/api-waf/**
       - terraform/modules/firewall/**
   workflow_dispatch: # Allow manual trigger
