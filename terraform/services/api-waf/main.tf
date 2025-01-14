@@ -52,7 +52,6 @@ module "aws_waf" {
   content_type = "APPLICATION_JSON"
 
   associated_resource_arn = data.aws_lb.api.arn
-  rate_limit              = var.app == "bcda" ? 300 : 3000
   ip_sets = var.env == "sbx" ? [] : [
     one(data.aws_wafv2_ip_set.external_services).arn,
     one(aws_wafv2_ip_set.api_customers).arn,
