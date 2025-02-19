@@ -17,6 +17,9 @@ build {
     remote_folder = "/home/ec2-user/"
     inline = [
       "sudo dnf install -y amazon-cloudwatch-agent jq git docker libicu curl",
+      "sudo mkdir -p /usr/local/lib/docker/cli-plugins",
+      "sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/lib/docker/cli-plugins/docker-compose",
+      "sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose",
       "sudo dnf install -y https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm",
       "sudo systemctl enable docker.service",
       "sudo systemctl enable containerd.service",
