@@ -21,7 +21,7 @@ variable "env" {
 variable "jenkins_security_group_id" {
   description = "Stores the security group managing Jenkins Agent for AB2D including account number for AB2D Management"
   type        = string
-  nullable    = false
+  # nullable    = false
 }
 
 variable "mgmt_vpc_cidr" {

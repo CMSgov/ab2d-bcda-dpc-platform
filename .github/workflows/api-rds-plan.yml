@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [ab2d]
+        app: [ab2d, bcda]
         env: [dev, test, sbx, prod]
     steps:
       - uses: actions/checkout@v4
