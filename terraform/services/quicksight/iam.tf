@@ -98,7 +98,7 @@ resource "aws_iam_policy" "full" {
         ]
         Resource = [
           "${local.dpc_glue_bucket_arn}/*",
-          "${local.dpc_glue_bucket_arn}"
+          local.dpc_glue_bucket_arn
         ]
       },
       {
@@ -149,7 +149,7 @@ resource "aws_iam_policy" "athena_query_source" {
         ]
         Resource = [
           "arn:aws:s3:::aws-athena-query-results-*",
-          "${local.dpc_glue_bucket_arn}",
+          local.dpc_glue_bucket_arn,
           "${local.dpc_glue_bucket_arn}/*"
         ]
       },
@@ -186,8 +186,8 @@ resource "aws_iam_policy" "athena_glue_access" {
         ]
         Resource = [
           "arn:aws:glue:us-east-1:${local.account_id}:catalog",
-          "${aws_glue_catalog_database.agg.arn}",
-          "${aws_glue_catalog_database.api.arn}"
+          aws_glue_catalog_database.agg.arn,
+          aws_glue_catalog_database.api.arn
         ]
       },
       {
@@ -198,8 +198,8 @@ resource "aws_iam_policy" "athena_glue_access" {
           "glue:GetTables"
         ]
         Resource = [
-          "${aws_glue_catalog_database.agg.arn}",
-          "${aws_glue_catalog_database.api.arn}",
+          aws_glue_catalog_database.agg.arn,
+          aws_glue_catalog_database.api.arn,
           "arn:aws:glue::${local.account_id}:table/${aws_glue_catalog_database.agg.name}/*",
           "arn:aws:glue::${local.account_id}:table/${aws_glue_catalog_database.api.name}/*"
         ]
@@ -234,7 +234,7 @@ resource "aws_iam_policy" "athena_query_results" {
         ]
         Resource = [
           "arn:aws:s3:::aws-athena-query-results-*",
-          "${local.dpc_athena_bucket_arn}",
+          local.dpc_athena_bucket_arn,
           "${local.dpc_athena_bucket_arn}/*"
         ]
       },
@@ -360,7 +360,7 @@ resource "aws_iam_policy" "iam-policy-firehose" {
           ]
           Effect = "Allow"
           Resource = [
-            "${local.dpc_glue_bucket_arn}",
+            local.dpc_glue_bucket_arn,
             "${local.dpc_glue_bucket_arn}/*",
           ]
           Sid = "GetS3Bucket"
@@ -596,7 +596,7 @@ resource "aws_iam_policy" "iam-policy-glue-crawler" {
         ]
         Effect = "Allow"
         Resource = [
-          "${local.dpc_glue_bucket_arn}"
+          local.dpc_glue_bucket_arn
         ]
         Sid = "s3Buckets"
       },
