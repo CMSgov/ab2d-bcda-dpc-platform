@@ -1,0 +1,36 @@
+name: AB2D WAF IP Sets Sync
+
+on:
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  waf-ip-sync:
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: ./scripts
+    strategy:
+      matrix:
+        app: [ab2d]
+        env: [dev, test, prod]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: CMSgov/cdap-private
+          ref: 'main'
+          sparse-checkout: ip_sets/ab2d/allowed_ips.txt
+          sparse-checkout-cone-mode: false
+          token: ${{ env.GITHUB_TOKEN }}
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.BCDA_ACCOUNT }}:role/delegatedadmin/developer/bcda-mgmt-github-actions
+          aws-region: ${{ vars.AWS_REGION }}
+      - run: bash waf-ip-set-sync.sh
+        env:
+          APP: ${{ matrix.app }}
+          ENV: ${{ matrix.env }}
