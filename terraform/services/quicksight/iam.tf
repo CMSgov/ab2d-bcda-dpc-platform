@@ -1,127 +1,4 @@
 ## quicksight-related policies and roles
-resource "aws_iam_group" "main" {
-  name = local.stack_prefix
-  path = "/delegatedadmin/developer/"
-}
-
-resource "aws_iam_policy" "full" {
-  name        = "dpc-insights-full-${var.env}"
-  path        = "/delegatedadmin/developer/"
-  description = "Allow full access and use of the ${local.stack_prefix} bucket for this account"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "S3Perms"
-        Effect = "Allow",
-        Action = [
-          "s3:PutAnalyticsConfiguration",
-          "s3:GetObjectVersionTagging",
-          "s3:CreateBucket",
-          "s3:ReplicateObject",
-          "s3:GetObjectAcl",
-          "s3:GetBucketObjectLockConfiguration",
-          "s3:DeleteBucketWebsite",
-          "s3:PutLifecycleConfiguration",
-          "s3:GetObjectVersionAcl",
-          "s3:PutBucketAcl",
-          "s3:PutObjectTagging",
-          "s3:HeadBucket",
-          "s3:DeleteObject",
-          "s3:DeleteObjectTagging",
-          "s3:GetBucketPolicyStatus",
-          "s3:PutAccountPublicAccessBlock",
-          "s3:GetObjectRetention",
-          "s3:GetBucketWebsite",
-          "s3:PutReplicationConfiguration",
-          "s3:DeleteObjectVersionTagging",
-          "s3:PutObjectLegalHold",
-          "s3:GetObjectLegalHold",
-          "s3:GetBucketNotification",
-          "s3:PutBucketCORS",
-          "s3:DeleteBucketPolicy",
-          "s3:GetReplicationConfiguration",
-          "s3:ListMultipartUploadParts",
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:PutBucketNotification",
-          "s3:PutBucketLogging",
-          "s3:PutObjectVersionAcl",
-          "s3:GetAnalyticsConfiguration",
-          "s3:PutBucketObjectLockConfiguration",
-          "s3:GetObjectVersionForReplication",
-          "s3:GetLifecycleConfiguration",
-          "s3:GetInventoryConfiguration",
-          "s3:GetBucketTagging",
-          "s3:PutAccelerateConfiguration",
-          "s3:DeleteObjectVersion",
-          "s3:GetBucketLogging",
-          "s3:ListBucketVersions",
-          "s3:ReplicateTags",
-          "s3:RestoreObject",
-          "s3:ListBucket",
-          "s3:GetAccelerateConfiguration",
-          "s3:GetBucketPolicy",
-          "s3:PutEncryptionConfiguration",
-          "s3:GetEncryptionConfiguration",
-          "s3:GetObjectVersionTorrent",
-          "s3:AbortMultipartUpload",
-          "s3:PutBucketTagging",
-          "s3:GetBucketRequestPayment",
-          "s3:GetObjectTagging",
-          "s3:GetMetricsConfiguration",
-          "s3:DeleteBucket",
-          "s3:PutBucketVersioning",
-          "s3:PutObjectAcl",
-          "s3:GetBucketPublicAccessBlock",
-          "s3:ListBucketMultipartUploads",
-          "s3:PutBucketPublicAccessBlock",
-          "s3:ListAccessPoints",
-          "s3:PutMetricsConfiguration",
-          "s3:PutObjectVersionTagging",
-          "s3:GetBucketVersioning",
-          "s3:GetBucketAcl",
-          "s3:BypassGovernanceRetention",
-          "s3:PutInventoryConfiguration",
-          "s3:GetObjectTorrent",
-          "s3:ObjectOwnerOverrideToBucketOwner",
-          "s3:GetAccountPublicAccessBlock",
-          "s3:PutBucketWebsite",
-          "s3:ListAllMyBuckets",
-          "s3:PutBucketRequestPayment",
-          "s3:PutObjectRetention",
-          "s3:GetBucketCORS",
-          "s3:PutBucketPolicy",
-          "s3:GetBucketLocation",
-          "s3:ReplicateDelete",
-          "s3:GetObjectVersion"
-        ]
-        Resource = [
-          "${local.dpc_glue_bucket_arn}/*",
-          local.dpc_glue_bucket_arn
-        ]
-      },
-      {
-        Sid    = "CMK"
-        Effect = "Allow"
-        Action = [
-          "kms:Encrypt",
-          "kms:Decrypt",
-          "kms:ReEncrypt*",
-          "kms:GenerateDataKey*",
-          "kms:DescribeKey"
-        ]
-        Resource = local.dpc_glue_bucket_key_arn
-      }
-    ]
-  })
-}
-
-resource "aws_iam_group_policy_attachment" "full_attach" {
-  group      = aws_iam_group.main.id
-  policy_arn = aws_iam_policy.full.arn
-}
-
 # Allows reads of inputs
 resource "aws_iam_policy" "athena_query_source" {
   name        = "dpc-insights-athena-query-src-${var.env}"
@@ -252,26 +129,6 @@ resource "aws_iam_policy" "athena_query_results" {
       }
     ]
   })
-}
-
-resource "aws_iam_group_policy_attachment" "athena_query_attach" {
-  group      = aws_iam_group.main.id
-  policy_arn = aws_iam_policy.athena_query_source.arn
-}
-
-resource "aws_iam_group_policy_attachment" "athena_catalog_attach" {
-  group      = aws_iam_group.main.id
-  policy_arn = aws_iam_policy.athena_glue_access.arn
-}
-
-resource "aws_iam_group_policy_attachment" "athena_results_attach" {
-  group      = aws_iam_group.main.id
-  policy_arn = aws_iam_policy.athena_query_results.arn
-}
-
-resource "aws_iam_group_policy_attachment" "athena_full_attach" {
-  group      = aws_iam_group.main.id
-  policy_arn = aws_iam_policy.full.arn
 }
 
 # CloudWatch Role
@@ -655,26 +512,18 @@ resource "aws_iam_role_policy_attachment" "iam-policy-athena-service" {
   policy_arn = data.aws_iam_policy.aws_athena_full_policy.arn
 }
 
-data "aws_kms_alias" "glue_s3_key" {
-  name = local.dpc_glue_bucket_key_alias
-}
-
 # Grant to QuickSight access to the Glue bucket key
 resource "aws_kms_grant" "glue" {
   name              = "${local.dpc_glue_s3_name}-grant"
-  key_id            = data.aws_kms_alias.glue_s3_key.target_key_id
+  key_id            = local.dpc_glue_bucket_key_id
   grantee_principal = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/service-role/aws-quicksight-service-role-v0"
   operations        = ["Encrypt", "Decrypt", "GenerateDataKey", "DescribeKey", "ReEncryptTo", "ReEncryptFrom"]
-}
-
-data "aws_kms_alias" "athena_s3_key" {
-  name = local.dpc_athena_bucket_key_alias
 }
 
 # Grant to QuickSight access to the Athena bucket key
 resource "aws_kms_grant" "athena" {
   name              = "${local.dpc_athena_s3_name}-grant"
-  key_id            = data.aws_kms_alias.athena_s3_key.target_key_id
+  key_id            = local.dpc_athena_bucket_key_id
   grantee_principal = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/service-role/aws-quicksight-service-role-v0"
   operations        = ["Encrypt", "Decrypt", "GenerateDataKey", "DescribeKey", "ReEncryptTo", "ReEncryptFrom"]
 }
