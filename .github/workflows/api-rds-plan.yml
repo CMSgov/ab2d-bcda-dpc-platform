@@ -34,6 +34,8 @@ jobs:
             env: test
           - app: bcda
             env: dev
+          - app: bcda
+            env: sbx
     steps:
       - uses: actions/checkout@v4
       - uses: ./actions/setup-tfenv-terraform
