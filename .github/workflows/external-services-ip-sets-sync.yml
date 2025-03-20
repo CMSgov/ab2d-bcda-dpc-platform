@@ -1,7 +1,10 @@
 name: External Services IP Sets Sync
 
 on:
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
+  push:
+    branches:
+      - 'jscott/PLT-506'
 
 permissions:
   contents: read
