@@ -1,0 +1,37 @@
+name: External Services IP Sets Sync
+
+on:
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  waf-ip-sync:
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: ./scripts
+    strategy:
+      matrix:
+        app: [ab2d]
+        env: [test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: CMSgov/cdap-private
+          ref: 'main'
+          sparse-checkout: ip_sets/external_services/allowed_ips.txt
+          sparse-checkout-cone-mode: false
+          token: ${{ env.GITHUB_TOKEN }}
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets[format('{0}_{1}_ACCOUNT', matrix.app, matrix.env)] }}:role/delegatedadmin/developer/${{ matrix.app }}-${{ matrix.env }}-github-actions
+          aws-region: ${{ vars.AWS_REGION }}
+      - run: bash waf-ip-set-sync.sh
+        env:
+          APP: ${{ matrix.app }}
+          ENV: ${{ matrix.env }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
