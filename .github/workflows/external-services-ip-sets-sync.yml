@@ -1,40 +1,50 @@
-name: External Services IP Sets Sync
+name: External Services WAF IP Sets Sync
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - 'jscott/PLT-506'
+  workflow_dispatch: # Allow manual trigger
 
 permissions:
   contents: read
   id-token: write
 
 jobs:
-  waf-ip-sync:
+  external-services-waf-ip-sync:
     runs-on: self-hosted
     defaults:
       run:
-        working-directory: ./scripts
+        shell: bash
     strategy:
       matrix:
         app: [ab2d]
         env: [test]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
+      - name: Checkout Platform Repository
+        uses: actions/checkout@v4
+      - name: Get AWS params
+        uses: cmsgov/ab2d-bcda-dpc-platform/actions/aws-params-env-action@main
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+        with:
+          params:
+            OPS_GITHUB_TOKEN=/ci/github/token
+      - name: Checkout Private Repository
+        uses: actions/checkout@v4
         with:
           repository: CMSgov/cdap-private
           ref: 'main'
-          sparse-checkout: ip_sets/external_services/allowed_ips.txt
+          sparse-checkout:
+            ip-sets/external-services/allowed_ips.txt
           sparse-checkout-cone-mode: false
-          token: ${{ env.GITHUB_TOKEN }}
-      - uses: aws-actions/configure-aws-credentials@v4
+          path: ./scripts/temp
+          token: ${{ env.OPS_GITHUB_TOKEN }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets[format('{0}_{1}_ACCOUNT', matrix.app, matrix.env)] }}:role/delegatedadmin/developer/${{ matrix.app }}-${{ matrix.env }}-github-actions
           aws-region: ${{ vars.AWS_REGION }}
-      - run: bash waf-ip-set-sync.sh
+      - name: Run WAF Sync Script
+        working-directory: scripts
+        run: bash waf-ip-set-sync-external-services.sh
         env:
           APP: ${{ matrix.app }}
           ENV: ${{ matrix.env }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
