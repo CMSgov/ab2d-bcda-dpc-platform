@@ -15,10 +15,10 @@ echo "App/Env are ${APP} ${ENV}"
 SAMPLE_NAME=$(aws ec2 describe-instances | jq -r '.Reservations[0].Instances[].Tags[] | select( .Key=="Name") | .Value')
 echo "Sample name is ${SAMPLE_NAME}"
 
-# aws wafv2 update-ip-set \
-#   --name external-services \
-#   --scope REGIONAL \
-#   --id $IPV4_SET_ID \
-#   --region us-east-1 \
-#   --addresses $IPV4_LIST \
-#   --lock-token $LOCK_TOKEN
+aws wafv2 update-ip-set \
+  --name external-services \
+  --scope REGIONAL \
+  --id $IPV4_SET_ID \
+  --region us-east-1 \
+  --addresses $IPV4_LIST \
+  --lock-token $LOCK_TOKEN
