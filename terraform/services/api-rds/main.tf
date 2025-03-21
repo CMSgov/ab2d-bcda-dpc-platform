@@ -29,7 +29,7 @@ locals {
 
   instance_class = {
     ab2d = "db.m6i.2xlarge"
-    bcda = var.env == "sbx" ? "db.m6i.xlarge" : "db.m6i.large"
+    bcda = (var.env == "sbx" || var.env == "prod") ? "db.m6i.xlarge" : "db.m6i.large"
   }[var.app]
 
   allocated_storage = {
@@ -47,8 +47,6 @@ locals {
   quicksight_cidr_blocks  = var.app != "ab2d" && length(data.aws_ssm_parameter.quicksight_cidr_blocks) > 0 ? jsondecode(data.aws_ssm_parameter.quicksight_cidr_blocks[0].value) : []
 
 }
-
-## Begin module/main.tf
 
 # Create database security group
 resource "aws_security_group" "sg_database" {
@@ -211,16 +209,15 @@ resource "aws_db_instance" "api" {
   vpc_security_group_ids  = var.app == "bcda" ? concat([aws_security_group.sg_database.id], local.gdit_security_group_ids) : [aws_security_group.sg_database.id]
   username                = data.aws_secretsmanager_secret_version.database_user.secret_string
   password                = data.aws_secretsmanager_secret_version.database_password.secret_string
-  # I'd really love to swap the password parameter here to manage_master_user_password since it's already in secrets store 
 
   tags = merge(
     data.aws_default_tags.data_tags.tags,
     tomap({ "Name" = var.app == "ab2d" ? "${local.db_name}-rds" : (
-      var.app == "bcda" && var.env == "sbx" ? "${var.app}-open${var.env}-rds" : local.db_name),
-      "role" = "db",
-      "cpm backup" = var.app == "ab2d" ? "Monthly" : (
-        var.app == "bcda" && var.env == "sbx" ? "4HR Daily Weekly Monthly" : "Daily Weekly Monthly"
-      ) # Daily Weekly Monthly for bcda
+      var.app == "bcda" && var.env == "sbx" ? "${var.app}-open${var.env}-rds" : (
+      var.app == "bcda" && var.env == "prod" ? "${var.app}-${var.env}-rds" : local.db_name)
+      ),
+      "role"       = "db",
+      "cpm backup" = (var.app == "bcda" && var.env == "sbx") || var.env == "prod" ? "4HR Daily Weekly Monthly" : "Daily Weekly Monthly"
     })
   )
 

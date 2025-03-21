@@ -21,15 +21,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [ab2d]
+        app: [ab2d, bcda]
         env: [dev, test, sbx, prod]
-        include:
-          - app: bcda
-            env: test
-          - app: bcda
-            env: dev
-          - app: bcda
-            env: sbx
     steps:
       - uses: actions/checkout@v4
       - uses: ./actions/setup-tfenv-terraform
