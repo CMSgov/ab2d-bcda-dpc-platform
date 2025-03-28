@@ -81,15 +81,18 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
   bucket = aws_s3_bucket.this.id
 
   rule {
+    bucket_key_enabled = var.bucket_key_enabled
     apply_server_side_encryption_by_default {
       kms_master_key_id = module.bucket_key.id
       sse_algorithm     = "aws:kms"
     }
   }
 }
+
 data "aws_s3_bucket" "bucket_access_logs" {
   bucket = "${data.aws_caller_identity.current.account_id}-bucket-access-logs"
 }
+
 resource "aws_s3_bucket_logging" "this" {
   bucket = aws_s3_bucket.this.id
 

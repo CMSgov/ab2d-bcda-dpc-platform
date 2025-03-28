@@ -15,4 +15,15 @@ terraform {
   backend "s3" {
     key = "quicksight/terraform.tfstate"
   }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5"
+    }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.7"
+    }
+  }
+  required_version = "~> 1.5"
 }
