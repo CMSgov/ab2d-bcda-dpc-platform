@@ -21,10 +21,21 @@ variable "env" {
 variable "jenkins_security_group_id" {
   description = "Stores the security group managing Jenkins Agent for AB2D including account number for AB2D Management"
   type        = string
-  # nullable    = false
 }
 
 variable "mgmt_vpc_cidr" {
   description = "CIDR for the Management VPC"
   type        = string
+}
+
+variable "name" {
+  description = "If more than one RDS instance is needed, this variable should be set"
+  type        = string
+  default     = "db"
+}
+
+variable "snapshot" {
+  description = "If specified, create a new RDS instance which is restored from this snapshot."
+  type        = string
+  default     = null
 }

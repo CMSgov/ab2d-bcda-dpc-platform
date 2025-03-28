@@ -1,21 +1,31 @@
 locals {
-  stdenv      = var.env == "sbx" ? "opensbx" : var.env
+  stdenv = (
+    var.app == "bcda" ? (var.env == "sbx" ? "opensbx" : var.env) :
+    var.app == "dpc" ? (var.env == "sbx" ? "prod-sbx" : var.env) :
+    var.env
+  )
   secret_date = "2020-01-02-09-15-01"
-  gdit_security_group_names = [
+  gdit_security_group_names = var.app == "bcda" ? [
     "${var.app}-${local.stdenv}-vpn-private",
     "${var.app}-${local.stdenv}-vpn-public",
     "${var.app}-${local.stdenv}-remote-management",
     "${var.app}-${local.stdenv}-enterprise-tools",
     "${var.app}-${local.stdenv}-allow-zscaler-private"
-  ]
+    ] : var.app == "dpc" ? [
+    "${var.app}-${local.stdenv}-remote-management",
+    "${var.app}-${local.stdenv}-enterprise-tools",
+    "${var.app}-${local.stdenv}-allow-zscaler-private"
+  ] : []
   db_username = {
     ab2d = "${var.app}/${local.db_name}/module/db/database_user/${local.secret_date}"
     bcda = "${var.app}/${local.stdenv}/db/username"
+    dpc  = "${var.app}/${local.stdenv}/db/username"
   }[var.app]
 
   db_password = {
     ab2d = "${var.app}/${local.db_name}/module/db/database_password/${local.secret_date}"
     bcda = "${var.app}/${local.stdenv}/db/password"
+    dpc  = "${var.app}/${local.stdenv}/db/password"
   }[var.app]
 }
 
@@ -76,9 +86,11 @@ data "aws_security_group" "controller_security_group_id" {
 }
 
 data "aws_kms_alias" "main_kms" {
-  count = var.app == "ab2d" ? 1 : 0 # Only query the KMS alias for ab2d
-  name  = "alias/${local.db_name}-main-kms"
+  count = var.app == "ab2d" || var.app == "dpc" ? 1 : 0 # Only query the KMS alias for ab2d or dpc
+
+  name = var.app == "ab2d" ? "alias/${local.db_name}-main-kms" : "alias/dpc-${var.env}-master-key"
 }
+
 
 data "aws_security_group" "app_sg" {
   count = var.app == "bcda" ? 1 : 0
@@ -97,7 +109,7 @@ data "aws_security_group" "worker_sg" {
 }
 
 data "aws_security_group" "gdit" {
-  for_each = var.app == "bcda" ? toset(local.gdit_security_group_names) : toset([])
+  for_each = toset(local.gdit_security_group_names)
 
   filter {
     name   = "tag:Name" # Filter by 'Name' tag
@@ -106,7 +118,8 @@ data "aws_security_group" "gdit" {
 }
 
 data "aws_security_group" "github_runner" {
-  count = var.app != "ab2d" ? 1 : 0
+  count = var.app == "bcda" ? 1 : 0
+
   filter {
     name   = "tag:Name"
     values = ["github-actions-action-runner"]
@@ -116,4 +129,21 @@ data "aws_security_group" "github_runner" {
 data "aws_ssm_parameter" "quicksight_cidr_blocks" {
   count = var.app != "ab2d" ? 1 : 0
   name  = "/${var.app}/${local.stdenv}/quicksight-rds/cidr-blocks"
+}
+
+data "aws_security_groups" "dpc_additional_sg" {
+  filter {
+    name   = "description"
+    values = ["Service traffic from within the VPC"]
+  }
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.target_vpc.id]
+  }
+}
+
+data "aws_iam_role" "rds_monitoring" {
+  count = var.app == "dpc" ? 1 : 0
+  name  = "rds-monitoring-role"
 }
