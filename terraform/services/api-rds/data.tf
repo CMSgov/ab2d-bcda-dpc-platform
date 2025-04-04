@@ -88,7 +88,7 @@ data "aws_security_group" "controller_security_group_id" {
 data "aws_kms_alias" "main_kms" {
   count = var.app == "ab2d" || var.app == "dpc" ? 1 : 0 # Only query the KMS alias for ab2d or dpc
 
-  name = var.app == "ab2d" ? "alias/${local.db_name}-main-kms" : "alias/dpc-${var.env}-master-key"
+  name = var.app == "ab2d" ? "alias/${local.db_name}-main-kms" : "alias/dpc-${local.stdenv}-master-key"
 }
 
 
@@ -133,8 +133,10 @@ data "aws_ssm_parameter" "quicksight_cidr_blocks" {
 
 data "aws_security_groups" "dpc_additional_sg" {
   filter {
-    name   = "description"
-    values = ["Service traffic from within the VPC"]
+    name = "description"
+    values = [
+      "Service traffic from within the VPC"
+    ]
   }
 
   filter {
