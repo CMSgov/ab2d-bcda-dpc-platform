@@ -85,13 +85,12 @@ data "aws_security_group" "db" {
   name = local.db_sg_name[var.app]
 }
 
-resource "aws_security_group_rule" "function_access" {
-  type        = "ingress"
+resource "aws_vpc_security_group_ingress_rule" "function_access" {
   from_port   = 5432
   to_port     = 5432
-  protocol    = "tcp"
+  ip_protocol = "tcp"
   description = "opt-out-export function access"
 
-  security_group_id        = data.aws_security_group.db.id
-  source_security_group_id = module.opt_out_export_function.security_group_id
+  security_group_id            = data.aws_security_group.db.id
+  referenced_security_group_id = module.opt_out_export_function.security_group_id
 }
