@@ -3,7 +3,7 @@ provider "aws" {
     tags = {
       application = var.app
       business    = "oeda"
-      code        = "https://github.com/CMSgov/ab2d-bcda-dpc-platform/tree/main/terraform/services/admin-create-group"
+      code        = "https://github.com/CMSgov/cdap/tree/main/terraform/services/admin-create-group"
       component   = "admin-create-group"
       environment = var.env
       terraform   = true

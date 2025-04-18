@@ -33,7 +33,7 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.BCDA_ACCOUNT }}:role/delegatedadmin/developer/bcda-mgmt-github-actions
           aws-region: ${{ vars.AWS_REGION }}
       - run: terraform init -backend-config=../../backends/bcda-mgmt.s3.tfbackend
-      - uses: cmsgov/ab2d-bcda-dpc-platform/actions/aws-params-env-action@main
+      - uses: cmsgov/cdap/actions/aws-params-env-action@main
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
         with:
