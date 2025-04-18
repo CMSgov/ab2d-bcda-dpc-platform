@@ -17,7 +17,7 @@ terraform plan
 
 ## How to manage IP allowlists:
 
-The WAF shared service creates empty IPv4 and IPv6 allowlists by default, and attaches them to the ACL. IP ranges in these allowlists can be managed through either a [Github Actions workflow](https://github.com/CMSgov/ab2d-bcda-dpc-platform/blob/main/.github/workflows/ab2d-ip-sets-sync.yml), like AB2D, or a [Lambda function](https://github.com/CMSgov/ab2d-bcda-dpc-platform/tree/main/terraform/services/api-waf-sync), like BCDA and DPC. These allowlists ensure that only IPs that fall within the defined CIDR ranges can make through the WAF and hit the associated API.
+The WAF shared service creates empty IPv4 and IPv6 allowlists by default, and attaches them to the ACL. IP ranges in these allowlists can be managed through either a [Github Actions workflow](https://github.com/CMSgov/cdap/blob/main/.github/workflows/ab2d-ip-sets-sync.yml), like AB2D, or a [Lambda function](https://github.com/CMSgov/cdap/tree/main/terraform/services/api-waf-sync), like BCDA and DPC. These allowlists ensure that only IPs that fall within the defined CIDR ranges can make through the WAF and hit the associated API.
 
 Additionally, we provide an external-services IP set, which is populated with internal CIDRs to allow access within the VPN. CIDRs included in this IP set fall under zScaler ranges and NAT gateways for VPCs on the same account. These IP sets are managed by the CDAP team.
 

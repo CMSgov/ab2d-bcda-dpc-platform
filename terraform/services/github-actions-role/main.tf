@@ -2,20 +2,20 @@ locals {
   provider_domain = "token.actions.githubusercontent.com"
   repos = {
     ab2d = [
-      "repo:CMSgov/ab2d-bcda-dpc-platform:*",
+      "repo:CMSgov/cdap:*",
       "repo:CMSgov/ab2d-events:*",
       "repo:CMSgov/ab2d-lambdas:*",
       "repo:CMSgov/ab2d-website:*",
       "repo:CMSgov/ab2d:*",
     ]
     bcda = [
-      "repo:CMSgov/ab2d-bcda-dpc-platform:*",
+      "repo:CMSgov/cdap:*",
       "repo:CMSgov/bcda-app:*",
       "repo:CMSgov/bcda-ssas-app:*",
       "repo:CMSgov/bcda-static-site:*",
     ]
     dpc = [
-      "repo:CMSgov/ab2d-bcda-dpc-platform:*",
+      "repo:CMSgov/cdap:*",
       "repo:CMSgov/dpc-app:*",
       "repo:CMSgov/dpc-static-site:*",
     ]

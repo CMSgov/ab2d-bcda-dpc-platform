@@ -9,7 +9,7 @@ module "iam_github_oidc_provider" {
 
   tags = {
     business  = "oeda"
-    code      = "https://github.com/CMSgov/ab2d-bcda-dpc-platform/tree/main/terraform/services/github-actions-oidc-provider"
+    code      = "https://github.com/CMSgov/cdap/tree/main/terraform/services/github-actions-oidc-provider"
     component = "github-actions"
     terraform = true
   }
