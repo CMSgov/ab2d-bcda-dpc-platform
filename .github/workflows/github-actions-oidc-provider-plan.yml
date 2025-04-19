@@ -41,6 +41,3 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
       - run: terraform init -backend-config=../../backends/${{ matrix.app }}-${{ matrix.env }}.s3.tfbackend
       - run: terraform plan
-        env:
-          TF_VAR_app: ${{ matrix.app }}
-          TF_VAR_env: ${{ matrix.env }}
