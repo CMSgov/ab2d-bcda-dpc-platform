@@ -25,7 +25,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::${{ secrets.BCDA_ACCOUNT }}:role/delegatedadmin/developer/bcda-mgmt-github-actions
           aws-region: ${{ vars.AWS_REGION }}
-      - uses: cmsgov/ab2d-bcda-dpc-platform/actions/aws-params-env-action@main
+      - uses: cmsgov/cdap/actions/aws-params-env-action@main
         with:
           params: |
             PKR_VAR_ami_account=/gold-image/account

@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "cmsgov/ab2d-bcda-dpc-platform.git",
+    "url": "cmsgov/cdap.git",
     "directory": "actions/aws-params-env-action"
   },
   "keywords": [
