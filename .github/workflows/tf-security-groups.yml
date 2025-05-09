@@ -1,0 +1,54 @@
+name: tf-security-groups
+run-name: tf-security-groups ${{ inputs.apply && 'apply' || 'plan' }}
+
+on:
+  push:
+    paths:
+      - .github/workflows/tf-security-groups.yml
+      - terraform/services/security-groups/**
+  workflow_dispatch:
+    inputs:
+      apply:
+        required: false
+        type: boolean
+
+jobs:
+  check-fmt:
+    runs-on: codebuild-cdap-${{github.run_id}}-${{github.run_attempt}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./actions/setup-tfenv-terraform
+      - run: terraform fmt -check -diff -recursive terraform/services/security-groups
+
+  plan-apply:
+    needs: check-fmt
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: codebuild-cdap-${{github.run_id}}-${{github.run_attempt}}
+    defaults:
+      run:
+        working-directory: ./terraform/services/security-groups
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [ab2d, bcda, dpc]
+        env: [dev, test, sandbox, prod]
+        include:
+          - app: cdap
+            env: mgmt
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./actions/setup-tfenv-terraform
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ contains(fromJSON('["dev", "test"]'), matrix.env) && secrets.NON_PROD_ACCOUNT || secrets.PROD_ACCOUNT }}:role/delegatedadmin/developer/${{ matrix.app }}-${{ matrix.env }}-github-actions
+          aws-region: ${{ vars.AWS_REGION }}
+      - run: terraform init -backend-config=../../backends/${{ matrix.app }}-${{ matrix.env }}-gf.s3.tfbackend
+      - run: terraform plan -out=tf.plan
+        env:
+          TF_VAR_app: ${{ matrix.app }}
+          TF_VAR_env: ${{ matrix.env }}
+          TF_VAR_legacy: "false"
+      - if: inputs.apply == true || github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve tf.plan

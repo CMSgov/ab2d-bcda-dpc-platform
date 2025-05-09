@@ -1,10 +1,10 @@
-name: service-security-groups plan terraform
+name: security-groups plan terraform
 
 on:
   pull_request:
     paths:
-      - .github/workflows/service-security-groups-plan.yml
-      - terraform/services/service-security-groups/**
+      - .github/workflows/security-groups-plan.yml
+      - terraform/services/security-groups/**
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./actions/setup-tfenv-terraform
-      - run: terraform fmt -check -diff -recursive terraform/services/service-security-groups
+      - run: terraform fmt -check -diff -recursive terraform/services/security-groups
 
   terraform-plan:
     needs: check-terraform-fmt
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./terraform/services/service-security-groups
+        working-directory: ./terraform/services/security-groups
     strategy:
       fail-fast: false
       matrix:

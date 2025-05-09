@@ -1,12 +1,12 @@
-name: service-security-groups apply terraform
+name: security-groups apply terraform
 
 on:
   push:
     branches:
       - main
     paths:
-      - .github/workflows/service-security-groups-apply.yml
-      - terraform/services/service-security-groups/**
+      - .github/workflows/security-groups-apply.yml
+      - terraform/services/security-groups/**
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./terraform/services/service-security-groups
+        working-directory: ./terraform/services/security-groups
     strategy:
       fail-fast: false
       matrix:

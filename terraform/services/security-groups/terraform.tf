@@ -3,7 +3,7 @@ provider "aws" {
     tags = {
       application = var.app
       business    = "oeda"
-      code        = "https://github.com/CMSgov/ab2d-bcda-dpc-platform/tree/main/terraform/services/service-security-groups"
+      code        = "https://github.com/CMSgov/ab2d-bcda-dpc-platform/tree/main/terraform/services/security-groups"
       environment = var.env
       terraform   = true
     }
@@ -12,6 +12,6 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    key = "service-security-groups/terraform.tfstate"
+    key = "security-groups/terraform.tfstate"
   }
 }
