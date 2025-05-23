@@ -1,26 +1,26 @@
 locals {
   full_name = "${var.app}-${var.env}-cclf-import"
-  bcda_db_envs = {
-    dev  = "dev"
-    test = "east-impl"
-    prod = "east-prod"
-  }
-  db_sg_name = {
+  bfd_env   = var.env == "prod" ? "prod" : "test"
+  db_sg_name = var.legacy ? {
     bcda = "bcda-${var.env}-rds"
-  }
+  }[var.app] : "${var.app}-${var.env}-db"
   memory_size = {
     bcda = 2048
   }
 }
 
-data "aws_ssm_parameter" "bfd_bucket_role_arn" {
-  name = "/cclf-import/${var.app}/${var.env}/bfd-bucket-role-arn"
+data "aws_ssm_parameter" "bfd_account" {
+  name = "/bfd/account-id"
 }
 
 data "aws_iam_policy_document" "assume_bucket_role" {
   statement {
-    actions   = ["sts:AssumeRole"]
-    resources = [data.aws_ssm_parameter.bfd_bucket_role_arn.value]
+    actions = ["sts:AssumeRole"]
+    resources = var.legacy ? [
+      "arn:aws:iam::${data.aws_ssm_parameter.bfd_account.value}:role/bfd-${local.bfd_env}-eft-${var.app}-bucket-role"
+      ] : [
+      "arn:aws:iam::${data.aws_ssm_parameter.bfd_account.value}:role/delegatedadmin/developer/bfd-${local.bfd_env}-eft-${var.app}-ct-bucket-role"
+    ]
   }
 }
 
@@ -66,7 +66,7 @@ module "cclf_import_queue" {
 # Add a rule to the database security group to allow access from the function
 
 data "aws_security_group" "db" {
-  name = local.db_sg_name[var.app]
+  name = local.db_sg_name
 }
 
 resource "aws_security_group_rule" "function_access" {
