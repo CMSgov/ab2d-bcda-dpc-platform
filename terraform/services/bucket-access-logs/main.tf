@@ -14,13 +14,19 @@ resource "aws_s3_bucket_versioning" "bucket_access_logs" {
   }
 }
 
+data "aws_kms_key" "managed_s3" {
+  key_id = "alias/aws/s3"
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_access_logs" {
   bucket = aws_s3_bucket.bucket_access_logs.id
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "aws:kms"
+      kms_master_key_id = data.aws_kms_key.managed_s3.arn
+      sse_algorithm     = "aws:kms"
     }
+    bucket_key_enabled = true
   }
 }
 
