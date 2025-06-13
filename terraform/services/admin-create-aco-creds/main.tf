@@ -1,7 +1,8 @@
 locals {
-  full_name   = "${var.app}-${var.env}-admin-create-aco-creds"
-  db_sg_name  = var.legacy ? "bcda-${var.env == "sbx" ? "opensbx" : var.env}-rds" : "bcda-${var.env}-db"
-  memory_size = 256
+  full_name         = "${var.app}-${var.env}-admin-create-aco-creds"
+  db_sg_name        = var.legacy ? "bcda-${var.env == "sbx" ? "opensbx" : var.env}-rds" : "bcda-${var.env}-db"
+  memory_size       = 256
+  creds_bucket_name = var.legacy ? ("bcda-aco-credentials/${var.env == "sbx" ? "opensbx" : var.env}/*") : ("bcda-${var.env}-aco-creds-*")
 }
 
 data "aws_caller_identity" "current" {}
@@ -15,7 +16,7 @@ data "aws_kms_alias" "aco_creds_kms" {
 data "aws_iam_policy_document" "creds_bucket" {
   statement {
     actions   = ["s3:PutObject"]
-    resources = ["arn:aws:s3:::bcda-aco-credentials/${var.env == "sbx" ? "opensbx" : var.env}/*"]
+    resources = ["arn:aws:s3:::${local.creds_bucket_name}"]
   }
 }
 
