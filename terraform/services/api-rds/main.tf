@@ -252,7 +252,7 @@ resource "aws_db_instance" "api" {
   backup_window                         = var.app == "dpc" || var.app == "bcda" ? "05:00-05:30" : null #1 am EST
   copy_tags_to_snapshot                 = var.app == "bcda" || var.app == "dpc" ? true : false
   kms_key_id                            = var.legacy && (var.app == "ab2d" || var.app == "dpc") ? data.aws_kms_alias.main_kms[0].target_key_arn : data.aws_kms_alias.default_rds.target_key_arn
-  multi_az                              = var.app == "dpc" ? (local.stdenv == "prod" || local.stdenv == "prod-sbx") : (var.env == "prod" || var.app == "bcda" ? true : false)
+  multi_az                              = var.env == "prod" ? true : false
   vpc_security_group_ids = var.legacy ? var.app == "bcda" || var.app == "dpc" ? concat([aws_security_group.sg_database.id], local.gdit_security_group_ids) : [
     aws_security_group.sg_database.id,
     ] : [
