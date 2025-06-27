@@ -15,9 +15,3 @@ variable "env" {
     error_message = "Valid value for env is dev, test, or prod."
   }
 }
-
-variable "legacy" {
-  description = "Is this applied in the legacy environment?"
-  type        = bool
-  default     = true
-}

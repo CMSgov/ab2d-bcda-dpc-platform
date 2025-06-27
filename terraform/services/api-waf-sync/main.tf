@@ -1,17 +1,13 @@
 locals {
-  full_name = "${var.app}-${var.env}-api-waf-sync"
-  db_sg_name = var.legacy ? {
-    bcda = "bcda-${var.env}-rds"
-    dpc  = "dpc-${var.env}-db"
-  }[var.app] : "${var.app}-${var.env}-db"
+  full_name  = "${var.app}-${var.env}-api-waf-sync"
+  db_sg_name = "${var.app}-${var.env}-db"
 }
 
 module "api_waf_sync_function" {
   source = "../../modules/function"
 
-  app    = var.app
-  env    = var.env
-  legacy = var.legacy
+  app = var.app
+  env = var.env
 
   name        = local.full_name
   description = "Synchronizes the IP whitelist in ${var.app} with the WAF IP Set"

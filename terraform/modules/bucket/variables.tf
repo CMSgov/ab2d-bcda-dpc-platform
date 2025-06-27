@@ -9,12 +9,6 @@ variable "cross_account_read_roles" {
   default     = []
 }
 
-variable "legacy" {
-  description = "Is this deployment in the greenfield environment (false)?"
-  type        = bool
-  default     = true
-}
-
 variable "ssm_parameter" {
   description = "SSM Parameter path for bucket output"
   type        = string

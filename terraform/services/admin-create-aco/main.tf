@@ -1,6 +1,6 @@
 locals {
   full_name   = "${var.app}-${var.env}-admin-create-aco"
-  db_sg_name  = var.legacy ? "bcda-${var.env == "sbx" ? "opensbx" : var.env}-rds" : "bcda-${var.env}-db"
+  db_sg_name  = "bcda-${var.env}-db"
   memory_size = 256
 }
 
@@ -22,8 +22,6 @@ module "admin_create_aco_function" {
     ENV      = var.env
     APP_NAME = "${var.app}-${var.env}-admin-create-aco"
   }
-
-  legacy = var.legacy
 }
 
 # Add a rule to the database security group to allow access from the function

@@ -15,9 +15,3 @@ variable "env" {
     error_message = "Valid value for env is dev, test, mgmt, sbx, sandbox, or prod."
   }
 }
-
-variable "legacy" {
-  description = "Is this deployment in the greenfield environment (false)?"
-  type        = bool
-  default     = true
-}

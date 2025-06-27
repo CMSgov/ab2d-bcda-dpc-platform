@@ -1,9 +1,7 @@
 locals {
-  full_name = "${var.app}-${var.env}-cclf-import"
-  bfd_env   = var.env == "prod" ? "prod" : "test"
-  db_sg_name = var.legacy ? {
-    bcda = "bcda-${var.env}-rds"
-  }[var.app] : "${var.app}-${var.env}-db"
+  full_name  = "${var.app}-${var.env}-cclf-import"
+  bfd_env    = var.env == "prod" ? "prod" : "test"
+  db_sg_name = "${var.app}-${var.env}-db"
   memory_size = {
     bcda = 2048
   }
@@ -16,9 +14,7 @@ data "aws_ssm_parameter" "bfd_account" {
 data "aws_iam_policy_document" "assume_bucket_role" {
   statement {
     actions = ["sts:AssumeRole"]
-    resources = var.legacy ? [
-      "arn:aws:iam::${data.aws_ssm_parameter.bfd_account.value}:role/bfd-${local.bfd_env}-eft-${var.app}-bucket-role"
-      ] : [
+    resources = [
       "arn:aws:iam::${data.aws_ssm_parameter.bfd_account.value}:role/delegatedadmin/developer/bfd-${local.bfd_env}-eft-${var.app}-ct-bucket-role"
     ]
   }
@@ -46,8 +42,6 @@ module "cclf_import_function" {
     ENV      = var.env
     APP_NAME = "${var.app}-${var.env}-cclf-import"
   }
-
-  legacy = var.legacy
 }
 
 # Set up queue for receiving messages when a file is added to the bucket

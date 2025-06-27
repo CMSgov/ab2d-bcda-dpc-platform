@@ -6,11 +6,7 @@ locals {
     sbx  = "ab2d-sbx-sandbox"
     prod = "api-ab2d-east-prod"
   }
-  load_balancers = var.legacy ? {
-    ab2d = "${local.ab2d_env_lbs[var.env]}"
-    bcda = "bcda-api-${local.is_sandbox ? "opensbx" : var.env}-01"
-    dpc  = "dpc-${local.is_sandbox ? "prod-sbx" : var.env}-1"
-    } : {
+  load_balancers = {
     ab2d = "ab2d-${var.env}-api"
     bcda = "bcda-api-${var.env}-01"
     dpc  = "dpc-${var.env}-1"

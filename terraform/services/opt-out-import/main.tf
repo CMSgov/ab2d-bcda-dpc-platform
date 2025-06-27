@@ -6,11 +6,7 @@ locals {
     test = "east-impl"
     prod = "east-prod"
   }
-  db_sg_name = var.legacy ? {
-    ab2d = "ab2d-${local.ab2d_db_envs[var.env]}-database-sg"
-    bcda = "bcda-${var.env}-rds"
-    dpc  = "dpc-${var.env}-db"
-  }[var.app] : "${var.app}-${var.env}-db"
+  db_sg_name = "${var.app}-${var.env}-db"
   memory_size = {
     ab2d = 1024
     bcda = null
@@ -30,9 +26,7 @@ data "aws_ssm_parameter" "bfd_account" {
 data "aws_iam_policy_document" "assume_bucket_role" {
   statement {
     actions = ["sts:AssumeRole"]
-    resources = var.legacy ? [
-      "arn:aws:iam::${data.aws_ssm_parameter.bfd_account.value}:role/bfd-${local.bfd_env}-eft-${var.app}-bucket-role"
-      ] : [
+    resources = [
       "arn:aws:iam::${data.aws_ssm_parameter.bfd_account.value}:role/delegatedadmin/developer/bfd-${local.bfd_env}-eft-${var.app}-ct-bucket-role"
     ]
   }
@@ -49,12 +43,6 @@ data "aws_db_instance" "this" {
   db_instance_identifier = one(one(data.aws_db_instances.this[*]).instance_identifiers)
 }
 
-#TODO: Post greenfield migration removal
-data "aws_ssm_parameter" "opt_out_db_host" {
-  count = var.legacy ? 1 : 0
-  name  = "/${var.app}/${var.env}/opt-out/db-host"
-}
-
 locals {
   #FIXME: database host parameters should be standardized
   db_hosts = sensitive({
@@ -62,16 +50,14 @@ locals {
     bcda = "postgres://${data.aws_db_instance.this.address}:5432/bcda"
     dpc  = data.aws_db_instance.this.address
   })
-  #TODO: Post greenfield migration removal: just use the db_hosts value
-  opt_out_db_host = var.legacy ? data.aws_ssm_parameter.opt_out_db_host[0].value : local.db_hosts[var.app]
+  opt_out_db_host = local.db_hosts[var.app]
 }
 
 module "opt_out_import_function" {
   source = "../../modules/function"
 
-  app    = var.app
-  env    = var.env
-  legacy = var.legacy
+  app = var.app
+  env = var.env
 
   name        = local.full_name
   description = "Ingests the most recent beneficiary opt-out list from BFD"

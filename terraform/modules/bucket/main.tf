@@ -8,9 +8,9 @@ module "bucket_key" {
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = var.legacy == true ? var.name : null
+  bucket = null
   # Max length on bucket_prefix is 37, so cut it to 36 plus the dash
-  bucket_prefix = var.legacy == false ? "${substr(var.name, 0, 36)}-" : null
+  bucket_prefix = "${substr(var.name, 0, 36)}-"
   force_destroy = true
 }
 
@@ -94,16 +94,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
       kms_master_key_id = module.bucket_key.id
       sse_algorithm     = "aws:kms"
     }
-    bucket_key_enabled = var.legacy ? false : true
+    bucket_key_enabled = true
   }
 }
 
 data "aws_iam_account_alias" "current" {}
 
 data "aws_s3_bucket" "bucket_access_logs" {
-  bucket = (var.legacy == true ? "${data.aws_caller_identity.current.account_id}-bucket-access-logs" :
-    data.aws_iam_account_alias.current.account_alias == "aws-cms-oeda-bcda-prod" ? "bucket-access-logs-20250411172631068600000001" :
-  "bucket-access-logs-20250409172631068600000001")
+  bucket = (data.aws_iam_account_alias.current.account_alias == "aws-cms-oeda-bcda-prod"
+    ? "bucket-access-logs-20250411172631068600000001"
+    : "bucket-access-logs-20250409172631068600000001"
+  )
 }
 
 resource "aws_s3_bucket_logging" "this" {
