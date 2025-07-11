@@ -13,7 +13,7 @@ locals {
 
   instance_class = {
     ab2d = "db.m6i.2xlarge"
-    bcda = (var.env == "sandbox" || var.env == "prod") ? "db.m6i.xlarge" : "db.m6i.large"
+    bcda = var.env == "prod" ? "db.m6i.xlarge" : "db.m6i.large"
     dpc  = "db.m6i.large" # node_type for instance class
   }[var.app]
 
@@ -29,7 +29,7 @@ locals {
     dpc  = 21 # 3 ETL periods instead of the default 7 days
   }[var.app]
 
-  quicksight_cidr_blocks  = var.app != "ab2d" && length(data.aws_ssm_parameter.quicksight_cidr_blocks) > 0 ? jsondecode(data.aws_ssm_parameter.quicksight_cidr_blocks[0].value) : []
+  quicksight_cidr_blocks = var.app != "ab2d" && length(data.aws_ssm_parameter.quicksight_cidr_blocks) > 0 ? jsondecode(data.aws_ssm_parameter.quicksight_cidr_blocks[0].value) : []
 
   dpc_specific_tags = {
     Layer       = "data"
@@ -68,26 +68,6 @@ resource "aws_vpc_security_group_ingress_rule" "db_access_from_controller" {
   ip_protocol                  = "tcp"
   referenced_security_group_id = data.aws_security_group.controller_security_group_id[count.index].id
   security_group_id            = aws_security_group.sg_database.id
-}
-
-resource "aws_vpc_security_group_ingress_rule" "db_access_from_mgmt" {
-  count             = (var.app == "ab2d" || var.app == "dpc") ? 1 : 0
-  description       = "Management VPC Access"
-  from_port         = 5432
-  to_port           = 5432
-  ip_protocol       = "tcp"
-  cidr_ipv4         = var.mgmt_vpc_cidr
-  security_group_id = aws_security_group.sg_database.id
-}
-
-resource "aws_vpc_security_group_ingress_rule" "runner_access" {
-  count                        = var.app == "bcda" ? 1 : 0
-  description                  = "GitHub Actions runner access"
-  from_port                    = 5432
-  to_port                      = 5432
-  ip_protocol                  = "tcp"
-  security_group_id            = aws_security_group.sg_database.id
-  referenced_security_group_id = data.aws_security_group.github_runner[count.index].id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "quicksight" {
@@ -175,13 +155,11 @@ resource "aws_db_instance" "api" {
   apply_immediately                     = true
   max_allocated_storage                 = var.app == "bcda" ? "1000" : (var.app == "dpc" ? "100" : null)
   storage_type                          = var.app == "dpc" ? "gp2" : null
-  monitoring_interval                   = var.app == "dpc" ? 60 : null
-  monitoring_role_arn                   = var.app == "dpc" ? data.aws_iam_role.rds_monitoring[0].arn : null
   performance_insights_enabled          = var.app == "dpc" ? true : null
   performance_insights_retention_period = var.app == "dpc" ? 7 : null
   backup_window                         = var.app == "dpc" || var.app == "bcda" ? "05:00-05:30" : null #1 am EST
   copy_tags_to_snapshot                 = var.app == "bcda" || var.app == "dpc" ? true : false
-  kms_key_id                            = (var.app == "ab2d" || var.app == "dpc") ? data.aws_kms_alias.main_kms[0].target_key_arn : data.aws_kms_alias.default_rds.target_key_arn
+  kms_key_id                            = data.aws_kms_alias.default_rds.target_key_arn
   multi_az                              = var.env == "prod" ? true : false
   vpc_security_group_ids = [
     aws_security_group.sg_database.id,
@@ -209,7 +187,7 @@ resource "aws_db_instance" "api" {
 /* DB - Route53 */
 resource "aws_route53_record" "rds" {
   count   = var.app == "bcda" || var.app == "dpc" ? 1 : 0
-  zone_id = var.app == "dpc" ? data.aws_route53_zone.local_zone[0].zone_id : data.aws_route53_zone.local_zone[0].zone_id
+  zone_id = var.app == "dpc" ? aws_route53_zone.local_zone[0].zone_id : data.aws_route53_zone.local_zone[0].zone_id
   name    = var.app == "dpc" ? "db.${aws_route53_zone.local_zone[0].name}" : "rds.${data.aws_route53_zone.local_zone[0].name}"
   type    = "CNAME"
   ttl     = "300"

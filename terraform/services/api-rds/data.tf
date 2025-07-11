@@ -56,15 +56,9 @@ data "aws_security_group" "controller_security_group_id" {
   }
 }
 
-data "aws_kms_alias" "main_kms" {
-  count = (var.app == "ab2d" || var.app == "dpc") ? 1 : 0 # Only query the KMS alias for ab2d or dpc
-  name  = var.app == "ab2d" ? "alias/${local.db_name}-main-kms" : "alias/dpc-${var.env}-master-key"
-}
-
 data "aws_kms_alias" "default_rds" {
   name = "alias/aws/rds"
 }
-
 
 data "aws_security_group" "app_sg" {
   #FIXME: Temporarily disabled in greenfield
@@ -84,15 +78,6 @@ data "aws_security_group" "worker_sg" {
   }
 }
 
-data "aws_security_group" "github_runner" {
-  count = var.app == "bcda" ? 1 : 0
-
-  filter {
-    name   = "tag:Name"
-    values = ["github-actions-action-runner"]
-  }
-}
-
 data "aws_ssm_parameter" "cdap_mgmt_vpc_cidr" {
   name = "/cdap/mgmt-vpc/cidr"
 }
@@ -100,9 +85,4 @@ data "aws_ssm_parameter" "cdap_mgmt_vpc_cidr" {
 data "aws_ssm_parameter" "quicksight_cidr_blocks" {
   count = var.app != "ab2d" ? 1 : 0
   name  = "/${var.app}/${var.env}/quicksight-rds/cidr-blocks"
-}
-
-data "aws_iam_role" "rds_monitoring" {
-  count = var.app == "dpc" ? 1 : 0
-  name  = "rds-monitoring-role"
 }

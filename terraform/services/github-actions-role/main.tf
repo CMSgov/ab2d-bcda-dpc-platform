@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "github_actions_role_assume" {
     ]
 
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = [data.aws_iam_role.admin.arn]
     }
   }
