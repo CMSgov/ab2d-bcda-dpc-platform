@@ -1,9 +1,9 @@
 module "platform" {
-  source = "git::https://github.com/CMSgov/ab2d-bcda-dpc-platform.git//terraform/modules/platform?ref=80d2d5e500bcf8a069386dee677404033af7782c"
+  source = "git::https://github.com/CMSgov/cdap.git//terraform/modules/platform?ref=80d2d5e500bcf8a069386dee677404033af7782c"
 
   app         = var.app
   env         = var.env
-  root_module = "https://github.com/CMSgov/ab2d-bcda-dpc-platform/tree/main/terraform/services/api-rds"
+  root_module = "https://github.com/CMSgov/cdap/tree/main/terraform/services/api-rds"
   service     = "api-rds"
 }
 
@@ -29,7 +29,7 @@ locals {
     dpc  = 21 # 3 ETL periods instead of the default 7 days
   }[var.app]
 
-  quicksight_cidr_blocks  = var.app != "ab2d" && length(data.aws_ssm_parameter.quicksight_cidr_blocks) > 0 ? jsondecode(data.aws_ssm_parameter.quicksight_cidr_blocks[0].value) : []
+  quicksight_cidr_blocks = var.app != "ab2d" && length(data.aws_ssm_parameter.quicksight_cidr_blocks) > 0 ? jsondecode(data.aws_ssm_parameter.quicksight_cidr_blocks[0].value) : []
 
   dpc_specific_tags = {
     Layer       = "data"

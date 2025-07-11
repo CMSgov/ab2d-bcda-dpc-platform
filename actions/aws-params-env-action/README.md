@@ -12,7 +12,7 @@ The only input is `params`, which accepts whitespace-separated pairs of the form
 
 ```
 - name: Set env vars from AWS params
-  uses: cmsgov/ab2d-bcda-dpc-platform/actions/aws-params-env-action@main
+  uses: cmsgov/cdap/actions/aws-params-env-action@main
   with:
     params: |
       VAR1=/aws/parameter/a

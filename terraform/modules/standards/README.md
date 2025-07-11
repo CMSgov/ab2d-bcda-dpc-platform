@@ -25,17 +25,17 @@ module "standards" {
 
   app         = var.app
   env         = var.env
-  root_module = "https://github.com/CMSgov/ab2d-bcda-dpc-platform/tree/main/terraform/services/api-rds"
+  root_module = "https://github.com/CMSgov/cdap/tree/main/terraform/services/api-rds"
   service     = "api-rds"
 }
 
 module "platform" {
   count  = var.legacy ? 0 : 1
-  source = "git::https://github.com/CMSgov/ab2d-bcda-dpc-platform.git//terraform/modules/platform?ref=80d2d5e500bcf8a069386dee677404033af7782c"
+  source = "git::https://github.com/CMSgov/cdap.git//terraform/modules/platform?ref=80d2d5e500bcf8a069386dee677404033af7782c"
 
   app         = var.app
   env         = var.env
-  root_module = "https://github.com/CMSgov/ab2d-bcda-dpc-platform/tree/main/terraform/services/api-rds"
+  root_module = "https://github.com/CMSgov/cdap/tree/main/terraform/services/api-rds"
   service     = "api-rds"
 }
 

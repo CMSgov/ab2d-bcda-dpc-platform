@@ -3,7 +3,7 @@ provider "aws" {
     tags = {
       application = var.app
       business    = "oeda"
-      code        = "https://github.com/CMSgov/ab2d-bcda-dpc-platform/tree/main/terraform/services/api-waf-sync"
+      code        = "https://github.com/CMSgov/cdap/tree/main/terraform/services/api-waf-sync"
       component   = "api-waf-sync"
       environment = var.env
       terraform   = true

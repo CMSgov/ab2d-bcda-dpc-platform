@@ -19,7 +19,7 @@ The key assumptions are focused on the existence of resources that managed exter
 module "platform" {
   # Ensure `ref` in the following line is pinned to something static
   # e.g. a known branch, commit hash, or tag from **this repository**
-  source = "git::https://github.com/CMSgov/ab2d-bcda-dpc-platform.git//terraform/modules/platform?ref=plt-1033"
+  source = "git::https://github.com/CMSgov/cdap.git//terraform/modules/platform?ref=plt-1033"
 
   app         = "ab2d"
   env         = var.env
