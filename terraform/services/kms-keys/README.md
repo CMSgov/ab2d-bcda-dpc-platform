@@ -1,11 +1,10 @@
-
 # Terraform for KMS Key Service
 
-This service provisions a **pair of AWS KMS Customer Managed Keys (CMKs)** — one in each of two different AWS accounts — to support secure encryption for application environments. A shared key model is used to reduce cost and simplify configuration across services.
+This service provisions a **pair of AWS KMS Customer Managed Keys (CMKs)** — one in each of two different AWS regions — to support secure encryption for application environments and enable disaster recovery. A shared key model is used to reduce cost and simplify configuration across services.
 
 ## Purpose
 
-Creates and manages standard KMS keys and aliases per environment (e.g., dev, test, prod) across primary and secondary AWS accounts using Terraform.
+Creates and manages standard KMS keys and aliases per environment (e.g., dev, test, prod) across primary and secondary AWS regions using Terraform.
 
 ## Manual Deploy
 
@@ -47,7 +46,7 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_standards"></a> [standards](#module\_standards) | ../../modules/standards | n/a |
+| <a name="module_standards"></a> [standards](#module\_standards) | github.com/CMSgov/cdap//terraform/modules/standards | 0bd3eeae6b03cc8883b7dbdee5f04deb33468260 |
 
 <!--WARNING: GENERATED CONTENT with terraform-docs, e.g.
      'terraform-docs --config "$(git rev-parse --show-toplevel)/.terraform-docs.yml" .'
@@ -62,6 +61,8 @@ No requirements.
 | [aws_kms_alias.secondary](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
 | [aws_kms_key.primary](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_kms_key.secondary](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
+| [aws_iam_policy_document.combined](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.default_kms_key_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 
 <!--WARNING: GENERATED CONTENT with terraform-docs, e.g.
